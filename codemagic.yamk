@@ -1,11 +1,9 @@
 workflows:
   android-release:
-    name: "SLM Play Android Release"
+    name: "SLM Rapport Android Release"
 
     environment:
       java: 17
-      vars:
-        PACKAGE_NAME: "com.slm.play"
 
     scripts:
       - name: "Check Java and Gradle"
@@ -24,17 +22,25 @@ workflows:
 
     artifacts:
       - app/build/outputs/apk/release/*.apk
-      - app/build/outputs/mapping/release/mapping.txt
-
 
   android-debug:
-    name: "SLM Play Debug APK"
+    name: "SLM Rapport Debug APK"
 
     environment:
       java: 17
 
     scripts:
       - name: "Prepare Gradle"
+        script: |
+          chmod +x ./gradlew
+          ./gradlew --version
+
+      - name: "Build debug APK"
+        script: |
+          ./gradlew assembleDebug
+
+    artifacts:
+      - app/build/outputs/apk/debug/*.apk      - name: "Prepare Gradle"
         script: |
           chmod +x ./gradlew
           ./gradlew --version
