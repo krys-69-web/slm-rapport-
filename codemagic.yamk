@@ -40,6 +40,12 @@ workflows:
           ./gradlew assembleDebug
 
     artifacts:
+      - app/build/outputs/apk/debug/*.apk
+      - name: "Build debug APK"
+        script: |
+          ./gradlew assembleDebug
+
+    artifacts:
       - app/build/outputs/apk/debug/*.apk      - name: "Prepare Gradle"
         script: |
           chmod +x ./gradlew
