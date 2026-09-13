@@ -1,0 +1,6 @@
+{
+  "name": "SLM Rapport",
+  "description": "Générateur et auditeur de rapport de stage 28 pages avec adaptation complète par filière, simulateur de jury, audit de conformité et export PDF haute définition.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
