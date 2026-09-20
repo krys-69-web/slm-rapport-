@@ -1,40 +1,19 @@
 workflows:
 android-workflow:
 name: slm-rapport
-max_build_duration: 60
 instance_type: mac_mini_m2
 
 environment:
   java: 21
-  vars:
-    PACKAGE_NAME: "com.aistudio.slmstretch.krvxpm"
 
 scripts:
-  - name: Set up Gradlew execute permissions
+  - name: Build APK
     script: |
       chmod +x gradlew
+      ./gradlew assembleDebug
 
-  - name: Check Gradle version
-    script: |
-      ./gradlew --version
-
-  - name: Restore Debug Keystore
-    script: |
-      echo "Setting up debug.keystore..."
-
-      if [ -f debug.keystore.base64 ]; then
-        base64 -D debug.keystore.base64 > debug.keystore 2>/dev/null || \
-        base64 --decode debug.keystore.base64 > debug.keystore 2>/dev/null || \
-        base64 -d debug.keystore.base64 > debug.keystore
-
-        echo "Keystore restored from base64 file"
-      else
-        echo "Generating new debug.keystore..."
-
-        keytool -genkeypair \
-          -v \
-          -keystore debug.keystore \
-          -storepass android \
+artifacts:
+  - app/build/outputs/apk/debug/*.apk          -storepass android \
           -alias androiddebugkey \
           -keypass android \
           -keyalg RSA \
