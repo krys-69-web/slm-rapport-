@@ -1,40 +1,50 @@
 workflows:
-  android-release:
-    name: "SLM Rapport Android Release"
+  android-workflow:
+    name: slm-rapport 
+    max_build_duration: 60
+    instance_type: mac_mini_m2
 
     environment:
-      java: 17
+      java: 21
+      vars:
+        PACKAGE_NAME: "com.aistudio.slmstretch.krvxpm"
 
     scripts:
-      - name: "Check Java and Gradle"
+      - name: Set up Gradlew execute permissions
         script: |
-          java -version
-          chmod +x ./gradlew
-          ./gradlew --version
+          chmod +x gradlew
 
-      - name: "Clean project"
+      - name: Restore Debug Keystore
         script: |
-          ./gradlew clean
+          echo "Setting up debug.keystore..."
+          if [ -f debug.keystore.base64 ]; then
+            base64 -D debug.keystore.base64 > debug.keystore 2>/dev/null || base64 --decode debug.keystore.base64 > debug.keystore 2>/dev/null || base64 -d debug.keystore.base64 > debug.keystore
+            echo "Keystore restored from base64 file"
+          else
+            echo "Generating new debug.keystore..."
+            keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+            echo "Keystore generated successfully"
+          fi
+          ls -l debug.keystore
 
-      - name: "Build release APK"
+      - name: Run Android Unit Tests
         script: |
-          ./gradlew assembleRelease
+          ./gradlew :app:testDebugUnitTest --stacktrace
+
+      - name: Build Android APK
+        script: |
+          ./gradlew :app:assembleDebug --stacktrace
 
     artifacts:
-      - app/build/outputs/apk/release/*.apk
+      - app/build/outputs/apk/**/*.apk
 
-  android-debug:
-    name: "SLM Rapport Debug APK"
-
-    environment:
-      java: 17
-
-    scripts:
-      - name: "Prepare Gradle"
-        script: |
-          chmod +x ./gradlew
-          ./gradlew --version
-
+    publishing:
+      email:
+        recipients:
+          - yjoanchris225@gmail.com
+        notify:
+          success: true
+          failure: true
       - name: "Build debug APK"
         script: |
           ./gradlew assembleDebug
